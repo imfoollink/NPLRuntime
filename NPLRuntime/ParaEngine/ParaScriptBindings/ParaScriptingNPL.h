@@ -201,6 +201,14 @@ namespace ParaScripting
 		static void call_(const char * sNPLFilename, const char* sCode);
 
 		/**
+		 * return an id string of this npl runtime. Upper-level scripts can check this id to distinguish different npl-runtimes to stop user from arbitrary copying dlls to a different game.
+		 */
+		static const char* GetNPLID();
+
+		/* crash on purpose for debug convenience */
+		static void Crash();
+
+		/**
 		* NOTE: the function name is "this" in NPL, not "this_". 
 		* associate a user defined function as the activation function of this file.
 		* add the current file name to the __act table.
