@@ -388,10 +388,10 @@ public class AppActivity extends Activity implements InputQueue.Callback, OnGlob
 
 			Object retValue = m.invoke(queue);
 
-			if(retValue instanceof Long)
-				return ((Long)retValue).longValue();
-			if(retValue instanceof Integer)
-				return ((Integer)retValue).longValue();
+			if (retValue instanceof Integer)
+				return ((Integer)retValue).intValue() & 0x0FFFFFFFFL;
+			if (retValue instanceof Number)
+				return ((Number)retValue).longValue();
 
 			throw new UnsatisfiedLinkError("Unknow type of return value to call InputQueue.getNativePtr");
 
