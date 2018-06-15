@@ -10,6 +10,7 @@
 #include "ParaEngine.h"
 #include "FileUtils.h"
 #include "StringHelper.h"
+#include "ZipWriter.h"
 #include "Framework/FileSystem/ParaFileUtils.h"
 #include <time.h>
 #include <sys/stat.h>
@@ -234,6 +235,10 @@ bool ParaEngine::CFileUtils::CopyFile(const char* src, const char* dest, bool bO
 		if (fileTo.CreateNewFile(dest))
 		{
 			fileTo.write(fileFrom.getBuffer(), (int)(fileFrom.getSize()));
+
+			//Cellfy: try to restore timestamp of the file
+			if(fileFrom.GetLastModifiedTime()>0)
+				fileTo.WriteLastModifiedTime(fileFrom.GetLastModifiedTime());
 			return true;
 		}
 	}
@@ -642,9 +647,12 @@ void FindFiles_Recursive(ParaEngine::CSearchResult& result, fs::path rootPath, c
 		fs::directory_iterator end_itr; // default construction yields past-the-end
 		for (fs::directory_iterator iter(rootPath); iter != end_itr; ++iter)
 		{
+			//cellfy: file_attr is only marked with directory(16) and regular_file(32) for now
+			DWORD file_attr = 0;
 			if (fs::is_directory(iter->status()))
 			{
 				// Found directory;
+				file_attr = 16;
 				if (nSubLevel > 0)
 				{
 					FindFiles_Recursive(result, iter->path(), reFilePattern, nSubLevel - 1);
@@ -656,12 +664,6 @@ void FindFiles_Recursive(ParaEngine::CSearchResult& result, fs::path rootPath, c
 					auto lastWriteTime = fs::last_write_time(iter->path());
 					FILETIME fileLastWriteTime;
 					ParaEngine::TimetToFileTime(lastWriteTime, &fileLastWriteTime);
-					//cellfy: file_attr is only marked with directory(16) and regular_file(32) for now
-					DWORD file_attr = 0;
-					if (fs::is_directory(iter->status()))
-						file_attr = 16;
-					else if (fs::is_regular_file(iter->status()))
-						file_attr = 32;
 
 					std::string sFullPath = iter->path().string();
 #ifdef WIN32
@@ -682,12 +684,13 @@ void FindFiles_Recursive(ParaEngine::CSearchResult& result, fs::path rootPath, c
 					ParaEngine::CParaFile::ToCanonicalFilePath(sFullPath, sFullPath, false);
 #endif
 
-					if (!result.AddResult(sFullPath, 0, 0, &fileLastWriteTime, &fileLastWriteTime, &fileLastWriteTime))
+					if (!result.AddResult(sFullPath, 0, file_attr, &fileLastWriteTime, &fileLastWriteTime, &fileLastWriteTime))
 						return;
 				}
 			}
 			else if (fs::is_regular_file(iter->status()))
 			{
+				file_attr = 32;
 				if (ParaEngine::StringHelper::MatchWildcard(iter->path().filename().string(), reFilePattern))
 				{
 					// Found file;
@@ -699,7 +702,7 @@ void FindFiles_Recursive(ParaEngine::CSearchResult& result, fs::path rootPath, c
 #ifdef WIN32
 					ParaEngine::CParaFile::ToCanonicalFilePath(sFullPath, sFullPath, false);
 #endif
-					if (!result.AddResult(sFullPath, (DWORD)fs::file_size(iter->path()), 0, &fileLastWriteTime, &fileLastWriteTime, &fileLastWriteTime))
+					if (!result.AddResult(sFullPath, (DWORD)fs::file_size(iter->path()), file_attr, &fileLastWriteTime, &fileLastWriteTime, &fileLastWriteTime))
 						return;
 				}
 			}
@@ -727,3 +730,44 @@ bool ParaEngine::CFileUtils::AddDiskSearchPath(const std::string& sFile, bool nF
 	return false;
 }
 
+bool ParaEngine::CFileUtils::WriteLastModifiedTimeToDisk(FileHandle& fileHandle, const std::string& fileName, const time_t& lastModifiedTime)
+{
+	bool op_result = false;
+#if defined(USE_COCOS_FILE_API) || defined(USE_BOOST_FILE_API)
+	if (!fileName.empty())
+	{
+		//platform: mobile
+		time_t platform_time;
+		standardtime2osfiletime(lastModifiedTime, &platform_time);
+		std::string sFilePath;
+		if (IsAbsolutePath(fileName))
+		{
+			sFilePath = GetFullPathForFilename(fileName);
+		}
+		else
+		{
+			sFilePath = GetWritablePath() + fileName;
+			sFilePath = GetFullPathForFilename(sFilePath);
+		}
+		fs::path filePath(sFilePath.c_str());
+		boost::system::error_code err_code;
+		fs::last_write_time(filePath, platform_time, err_code);
+		op_result = (err_code.value() == boost::system::errc::success);
+	}
+#else
+	#if defined(WIN32)
+	if (fileHandle.IsValid())
+	{
+
+		//platform: win32
+		FILETIME platform_time;
+		standardtime2osfiletime(lastModifiedTime, &platform_time);
+
+		op_result = (SetFileTime(fileHandle.m_handle, &platform_time, &platform_time, &platform_time) != FALSE);
+	#else
+		//other platform : not implemented for now
+	#endif
+	}
+#endif
+	return op_result;
+}

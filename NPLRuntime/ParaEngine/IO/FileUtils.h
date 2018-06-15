@@ -215,12 +215,15 @@ namespace ParaEngine
 		*  @return  The path that can be write/read a file in
 		*/
 		static const std::string& GetWritablePath();
-		
+
 		/** not thread safe, only set at startup when there is just one thread running. */
 		static void SetWritablePath(const std::string& writable_path);
 
 		/** this is a recursive function. @see SearchFiles */
 		static void FindDiskFiles(CSearchResult& result, const std::string& sRootPath, const std::string& sFilePattern, int nSubLevel);
+
+		/** fileHandle is for win32, and fileName for other platform, but both needed here for validity check and avoiding re-compile this header */
+		static bool WriteLastModifiedTimeToDisk(FileHandle& fileHandle, const std::string& fileName, const time_t& lastModifiedTime);
 	public:
 		// this is usually /mnt/sdcard/XXX/ in android. 
 		static std::string s_writepath;
