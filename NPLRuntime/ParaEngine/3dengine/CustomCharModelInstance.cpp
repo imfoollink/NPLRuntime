@@ -1272,6 +1272,10 @@ TextureEntity* CharModelInstance::GetReplaceableTexture(int ReplaceableTextureID
 						}
 					}
 				}
+				else
+				{
+					return mReplaceableTexturesCache[ReplaceableTextureID].get();
+				}
 			}
 		}
 
@@ -1606,6 +1610,7 @@ CParameterBlock * ParaEngine::CharModelInstance::GetAttachmentParamBlock(int att
 	}
 	return nullptr;
 }
+
 
 void CharModelInstance::AddAttachment(MeshEntity* pModelEntity, int nAttachmentID, int nSlotID, float fScaling, TextureEntity* pReplaceableTexture)
 {
