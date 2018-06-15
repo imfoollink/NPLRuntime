@@ -201,8 +201,8 @@ namespace ParaScripting
 		static void call_(const char * sNPLFilename, const char* sCode);
 
 		/**
-		 * return an id string of this npl runtime. Upper-level scripts can check this id to distinguish different npl-runtimes to stop user from arbitrary copying dlls to a different game.
-		 */
+		* return an id string of this npl runtime. Upper-level scripts can check this id to distinguish different npl-runtimes to stop user from arbitrary copying dlls to a different game.
+		*/
 		static const char* GetNPLID();
 
 		/* crash on purpose for debug convenience */

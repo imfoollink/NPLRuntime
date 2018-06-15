@@ -1399,10 +1399,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 #ifdef PARAENGINE_MOBILE
 			OUTPUT_LOG("cellfy -----------  loading crates\n");
 
-
-
-
-
 			// File searching in Android APK is invalid, so all the pkgs are hard coded here temporarily
 			if (CParaFile::DoesFileExist("crate900.pkg") || CParaFile::DoesFileExist("crate900.zip"))
 				fileList.push_back("crate900.zip");

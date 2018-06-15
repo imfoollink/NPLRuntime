@@ -464,6 +464,12 @@ void CharModelInstance::UpdateTexturesToModel(CParaXModel* pModel)
 	}
 	else
 	{
+		for(auto & replaceable_texture_pair:mReplaceableTexturesCache)
+		{
+			SetReplaceableTexture(replaceable_texture_pair.first,replaceable_texture_pair.second.get());
+			replaceable_texture_pair.second.reset();
+		}
+		mReplaceableTexturesCache.clear();
 		for (int i = 0, k = 0; i < CParaXModel::MAX_MODEL_TEXTURES; ++i)
 		{
 			int nIndex = pModel->specialTextures[i];
@@ -1307,7 +1313,7 @@ bool CharModelInstance::SetReplaceableTexture(int ReplaceableTextureID, TextureE
 							if (nIndex == ReplaceableTextureID)
 							{
 								m_textures[k] = pTextureEntity;
-								return true;
+								//return true;
 							}
 							k++;
 						}
@@ -1318,7 +1324,7 @@ bool CharModelInstance::SetReplaceableTexture(int ReplaceableTextureID, TextureE
 					// model is NULL, this is mostly because model is asynchronously  loaded. we shall assume it is 0. 
 					// this is correct, if the model has only one replaceable texture, however it can be wrong. 
 					// TODO: is there a better way to preload. 
-					m_textures[0] = pTextureEntity;
+					mReplaceableTexturesCache[ReplaceableTextureID] = pTextureEntity;
 				}
 			}
 		}
@@ -1562,7 +1568,7 @@ void CharModelInstance::CastEffect(int nEffectID, int nAttachmentID, int nSlotID
 	}
 }
 
-void CharModelInstance::AddAttachment(ParaXEntity* pModelEntity, int nAttachmentID, int nSlotID, float fScaling, TextureEntity* pReplaceableTexture)
+void CharModelInstance::AddAttachment(ParaXEntity* pModelEntity, int nAttachmentID, int nSlotID, float fScaling, TextureEntity* pReplaceableTexture,int replaceableTextureID)
 {
 	if (pModelEntity == 0)
 	{
@@ -1576,7 +1582,7 @@ void CharModelInstance::AddAttachment(ParaXEntity* pModelEntity, int nAttachment
 		CanvasAttachment* pAtt = m_pModelCanvas->addAttachment(pModelEntity, nAttachmentID, nSlotID, fScaling);
 		if (pReplaceableTexture && pAtt)
 		{
-			pAtt->SetReplaceableTexture(pReplaceableTexture);
+			pAtt->SetReplaceableTexture(pReplaceableTexture,replaceableTextureID);
 		}
 	}
 }
@@ -1591,6 +1597,15 @@ IAttributeFields * CharModelInstance::GetAttachmentAttObj(int nAttachmentID)
 	return NULL;
 }
 
+CParameterBlock * ParaEngine::CharModelInstance::GetAttachmentParamBlock(int attachmentID,int slotID)
+{
+	CanvasAttachment* pAtt=m_pModelCanvas->GetChild(attachmentID,slotID);
+	if(pAtt)
+	{
+		return pAtt->GetParamBlock(true);
+	}
+	return nullptr;
+}
 
 void CharModelInstance::AddAttachment(MeshEntity* pModelEntity, int nAttachmentID, int nSlotID, float fScaling, TextureEntity* pReplaceableTexture)
 {
