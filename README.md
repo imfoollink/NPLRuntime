@@ -1,50 +1,16 @@
-[![Build Status](https://travis-ci.org/LiXizhi/NPLRuntime.svg?branch=master)](https://travis-ci.org/LiXizhi/NPLRuntime)
-[![Build status](https://ci.appveyor.com/api/projects/status/k9e19sceq859bt4p?svg=true)](https://ci.appveyor.com/project/DarrenGZY/nplruntime-e8wud)
-[![Code docs](https://codedocs.xyz/LiXizhi/NPLRuntime.svg)](https://codedocs.xyz/LiXizhi/NPLRuntime)
-[![Documentation Status](https://readthedocs.org/projects/tatfook-npldocs/badge/?version=master)](http://docs.paraengine.com/en/master/?badge=master)
-
-
-Welcome to the NPL Runtime!
--------------------------
-NPL or Neural Parallel Language is an open source, high-performance, scripting language. Its syntax is 100%-compatible with [lua](http://www.lua.org). NPL runtime provides essential functionality for building `3D/2D/Server` applications that runs on `windows/linux/android/iOS`. 
-
 ### Install Guide
-```
-git clone https://github.com/LiXizhi/NPLRuntime.git
-./build_linux.sh
-```
-See [Install Guide](https://github.com/LiXizhi/NPLRuntime/wiki/InstallGuide) for details
 
-### Getting Started
-* [What is NPL?](https://github.com/LiXizhi/NPLRuntime/wiki/WhatIsNPL)
-* [Tutorial: HelloWorld](https://github.com/LiXizhi/NPLRuntime/wiki/TutorialHelloWorld)
-* [Source Code Overview](https://github.com/LiXizhi/NPLRuntime/wiki/SourceCodeOverview)
+#### Environment Setup
+- Install CMake 3.11: ftp://10.0.1.201//home/ftp_default_user/NPL_SDK/DEVKIT/Mobile2/cmake-3.11.3-win64-x64.msi
+- Install Android NDK r9d: ftp://10.0.1.201//home/ftp_default_user/NPL_SDK/DEVKIT/Mobile2/android-ndk-r9d-windows-x86_64.zip
+- Install Android SDK: ftp://10.0.1.201//home/ftp_default_user/NPL_SDK/DEVKIT/Mobile2/android-studio-bundle-145.3330264-windows.exe
+- Extract boost to your local drive: ftp://10.0.1.201//home/ftp_default_user/NPL_SDK/DEVKIT/Mobile2/boost_1_65_1.rar
+- Set environment variable: BOOST_ROOT to your boost root directory.
+- Install nVidia Nsight for Tegra: ftp://10.0.1.201//home/ftp_default_user/NPL_SDK/DEVKIT/Mobile2/NVIDIA_Nsight_Tegra_Release_3.5.18065.5230.exe
+- Open Vistual Studio, Nsight->Options..., Fill out NDK, SDK, etc. fields respectively.
 
-### Example code
-```lua
--- this is from `helloworld.npl`
-NPL.activate("(gl)helloworld.npl", {data="hello world!"})
-this(msg){
-   if(msg) then
-      print(msg.data or "");
-   end
-}
-```
-
-### Why a New Programming Language?
-NPL prototype was designed in 2004, which was then called 'parallel oriented language'. NPL is initially designed to write flexible algorithms that works in a multi-threaded, and distributed environment with many computers across the network. More specifically, I want to have a language that is suitable for writing neural network algorithms, 3d simulation and visualization. Lua and C/C++ affinity was chosen from the beginning. 
-
- 
-### Usage
-To run with GUI, use:
-``` 
-npl [filename] [parameters...]
-```    
-To run in server mode, use:
-```	
-npls [filename] [parameters...]
-```    
-For example:
-```	
-npls hello.npl
-```    
+#### Build
+- Clone the project from: http://10.0.1.201/FrontEnd/NPLRuntime_truck_star
+- Checkout truck_star_CP branch
+- Cmake, generate a vistual studio solution for android.
+- Open the solution in visual studio and build Debug version.
