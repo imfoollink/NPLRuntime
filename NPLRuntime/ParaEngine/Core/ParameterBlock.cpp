@@ -133,13 +133,13 @@ bool CParameterBlock::ApplyToEffect( CEffectFile* pEffectFile )
 					else
 					{
 						// use custom texture
-						if (strcmp(GLProgram::UNIFORM_NAME_SAMPLER0,name)==0)
+						if (strcmp("tex0Sampler",name)==0)
 							pEffectFile->setTexture(0, pTextureEntity->GetTexture());
-						else if (strcmp(GLProgram::UNIFORM_NAME_SAMPLER1, name) == 0)
+						else if (strcmp("tex1Sampler", name) == 0)
 							pEffectFile->setTexture(1, pTextureEntity->GetTexture());
-						else if (strcmp(GLProgram::UNIFORM_NAME_SAMPLER2, name) == 0)
+						else if (strcmp("tex2Sampler", name) == 0)
 							pEffectFile->setTexture(2, pTextureEntity->GetTexture());
-						else if (strcmp(GLProgram::UNIFORM_NAME_SAMPLER3, name) == 0)
+						else if (strcmp("tex3Sampler", name) == 0)
 							pEffectFile->setTexture(3, pTextureEntity->GetTexture());
 					}
 				}

@@ -2358,7 +2358,7 @@ bool EffectManager::BeginEffectShader(int nHandle, CEffectFile** pOutEffect)
 		*/
 		if (nHandle>1000)
 		{
-			pEffect->use();
+			//pEffect->use();
 			auto pDecl = GetVertexDeclaration(S0_POS_NORM_TEX0);
 
 			if (pDecl == 0)
@@ -2370,15 +2370,15 @@ bool EffectManager::BeginEffectShader(int nHandle, CEffectFile** pOutEffect)
 			DisableD3DAlphaTesting(true);
 			pEffect->EnableAlphaBlending(false);
 			pEffect->EnableAlphaTesting(false);
-			pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-			pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); // force blending
-			pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-			pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			pd3dDevice->SetRenderState(ERenderState::ALPHATESTENABLE, FALSE);
+			pd3dDevice->SetRenderState(ERenderState::ALPHABLENDENABLE, TRUE); // force blending
+			pd3dDevice->SetRenderState(ERenderState::ZWRITEENABLE, TRUE);
+			pd3dDevice->SetRenderState(ERenderState::SRCBLEND, D3DBLEND_SRCALPHA);
+			pd3dDevice->SetRenderState(ERenderState::DESTBLEND, D3DBLEND_INVSRCALPHA);
 			SetCullingMode(true);
-			pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-			SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR, true);
-			SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR, true);
+			pd3dDevice->SetSamplerState(0, ESamplerStateType::MIPFILTER, D3DTEXF_LINEAR);
+			SetSamplerState(0, ESamplerStateType::MINFILTER, D3DTEXF_LINEAR, true);
+			SetSamplerState(0, ESamplerStateType::MAGFILTER, D3DTEXF_LINEAR, true);
 
 			pEffect->EnableNormalMap(false);
 			pEffect->EnableReflectionMapping(false);
@@ -2387,8 +2387,8 @@ bool EffectManager::BeginEffectShader(int nHandle, CEffectFile** pOutEffect)
 			EnableGlobalLighting(bEnableSunLight && bEnableLight);
 			EnableLocalLighting(bEnableLight);
 
-			pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+			pd3dDevice->SetSamplerState(0, ESamplerStateType::ADDRESSU, D3DTADDRESS_WRAP);
+			pd3dDevice->SetSamplerState(0, ESamplerStateType::ADDRESSV, D3DTADDRESS_WRAP);
 
 			applyFogParameters();
 
