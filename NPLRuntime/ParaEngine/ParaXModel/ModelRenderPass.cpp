@@ -195,6 +195,10 @@ bool ModelRenderPass::init_FX(CParaXModel *m, SceneState* pSceneState,CParameter
 		{
 			pEffect->setFloat(CEffectFile::k_opacity, ocol.w);
 		}
+		else
+		{
+			pEffect->setFloat(CEffectFile::k_opacity, 1.0f);
+		}
 
 		if (color != -1)
 		{

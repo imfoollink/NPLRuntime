@@ -2349,7 +2349,61 @@ bool EffectManager::BeginEffectShader(int nHandle, CEffectFile** pOutEffect)
 		break;
 	}
 	default:
-		break;
+	{
+		// handle user defined effect file
+		/**
+		* 100-200: using declaration: POSITION|Tex1
+		* 1000+: using declaration: POSITION|NORMAL|Tex1
+		* etc.
+		*/
+		if (nHandle>1000)
+		{
+			pEffect->use();
+			auto pDecl = GetVertexDeclaration(S0_POS_NORM_TEX0);
+
+			if (pDecl == 0)
+				return false;
+
+			pd3dDevice->SetIndices(0);
+			pd3dDevice->SetStreamSource(0, 0, 0, 0);
+			pd3dDevice->SetVertexDeclaration(pDecl);
+			DisableD3DAlphaTesting(true);
+			pEffect->EnableAlphaBlending(false);
+			pEffect->EnableAlphaTesting(false);
+			pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+			pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); // force blending
+			pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+			pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+			pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			SetCullingMode(true);
+			pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+			SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR, true);
+			SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR, true);
+
+			pEffect->EnableNormalMap(false);
+			pEffect->EnableReflectionMapping(false);
+			pEffect->EnableEnvironmentMapping(false);
+
+			EnableGlobalLighting(bEnableSunLight && bEnableLight);
+			EnableLocalLighting(bEnableLight);
+
+			pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+			pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+
+			applyFogParameters();
+
+			if (pEffect->GetParamBlock())
+			{
+				// apply per effect parameters. 
+				pEffect->GetParamBlock()->ApplyToEffect(pEffect);
+			}
+		}
+		else
+		{
+
+		}
+	}
+	break;
 	}
 #endif
 	return true;
