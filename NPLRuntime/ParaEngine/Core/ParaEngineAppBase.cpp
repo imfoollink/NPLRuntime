@@ -1354,7 +1354,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 	* such that "main_001.pkg" is always loaded before "main_002.pkg" */
 #define MAIN_PACKAGE_FILE_PATTERN_MAIN	"main*.pkg"
 #define MAIN_PACKAGE_FILE_PATTERN_CRATE	"crate*.pkg"
-	OUTPUT_LOG("cellfy -----------  entered\n");
 	bool bIs64Bits = sizeof(void*) > 4;
 
 	std::vector<std::string> fileList;
@@ -1368,7 +1367,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 	{
 		result_main_valid = true;
 		nNum = result_main->GetNumOfResult();
-		OUTPUT_LOG("cellfy -----------  main number %d\n", nNum);
 		for (int i = 0; i < nNum; ++i)
 		{
 			fileList.push_back(result_main->GetItem(i));
@@ -1381,7 +1379,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 	{
 		result_crate_valid = true;
 		nNum = result_crate->GetNumOfResult();
-		OUTPUT_LOG("cellfy -----------  crate number %d\n", nNum);
 		for (int i = 0; i < nNum; ++i)
 		{
 			fileList.push_back(result_crate->GetItem(i));
@@ -1396,25 +1393,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 
 		if (fileList.size() == 0)
 		{
-#ifdef PARAENGINE_MOBILE
-			OUTPUT_LOG("cellfy -----------  loading crates\n");
-
-			// File searching in Android APK is invalid, so all the pkgs are hard coded here temporarily
-			if (CParaFile::DoesFileExist("crate900.pkg") || CParaFile::DoesFileExist("crate900.zip"))
-				fileList.push_back("crate900.zip");
-			if (CParaFile::DoesFileExist("crate104.pkg") || CParaFile::DoesFileExist("crate104.zip"))
-				fileList.push_back("crate104.zip");
-			if (CParaFile::DoesFileExist("crate103.pkg") || CParaFile::DoesFileExist("crate103.zip"))
-				fileList.push_back("crate103.zip");
-			if (CParaFile::DoesFileExist("crate102.pkg") || CParaFile::DoesFileExist("crate102.zip"))
-				fileList.push_back("crate102.zip");
-			if (CParaFile::DoesFileExist("crate003.pkg") || CParaFile::DoesFileExist("crate003.zip"))
-				fileList.push_back("crate003.zip");
-			if (CParaFile::DoesFileExist("crate002.pkg") || CParaFile::DoesFileExist("crate002.zip"))
-				fileList.push_back("crate002.zip");
-			if (CParaFile::DoesFileExist("crate001.pkg") || CParaFile::DoesFileExist("crate001.zip"))
-				fileList.push_back("crate001.zip");
-#endif
 			if (CParaFile::DoesFileExist("main_mobile_res.pkg") || CParaFile::DoesFileExist("main_mobile_res.zip"))
 				fileList.push_back("main_mobile_res.zip");
 			if (CParaFile::DoesFileExist("main150727.pkg") || CParaFile::DoesFileExist("main150727.zip"))
@@ -1439,7 +1417,6 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 		for (auto& filename : fileList)
 		{
 			int nSize = (int)filename.size();
-			OUTPUT_LOG("cellfy -----------  pkg name %s\n", filename.c_str());
 			if (nSize > 11 && filename[nSize - 11] == '_' && filename[nSize - 8] == 'b')
 			{
 				if (filename[nSize - 10] == '3' && filename[nSize - 9] == '2' && bIs64Bits)
