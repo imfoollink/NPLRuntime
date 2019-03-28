@@ -1910,28 +1910,30 @@ void CAutoCamera::HandleUserInput()
 		bIsKeyProcessed = bIsKeyProcessed || bAlterKeyPressed;
 	}
 
-	SetKeyDownState(MOVE_FORWARD, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_FORWARD)/*DIK_W*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD8) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_UP)));
-	SetKeyDownState(MOVE_BACKWARD, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_BACKWARD)/*DIK_S*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD2) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_DOWN)));
-	
-	if(IsShiftMoveSwitched())
+	if (GetEnableKeyboard())
 	{
-		SetKeyDownState(SHIFT_LEFT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(SHIFT_LEFT)) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD7) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_LEFT)));
-		SetKeyDownState(SHIFT_RIGHT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(SHIFT_RIGHT)) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD9) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_RIGHT)));
-		SetKeyDownState(MOVE_LEFT, FALSE);
-		SetKeyDownState(MOVE_RIGHT, FALSE);
+		SetKeyDownState(MOVE_FORWARD, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_FORWARD)/*DIK_W*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD8) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_UP)));
+		SetKeyDownState(MOVE_BACKWARD, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_BACKWARD)/*DIK_S*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD2) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_DOWN)));
+		
+		if(IsShiftMoveSwitched())
+		{
+			SetKeyDownState(SHIFT_LEFT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(SHIFT_LEFT)) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD7) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_LEFT)));
+			SetKeyDownState(SHIFT_RIGHT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(SHIFT_RIGHT)) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD9) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_RIGHT)));
+			SetKeyDownState(MOVE_LEFT, FALSE);
+			SetKeyDownState(MOVE_RIGHT, FALSE);
+		}
+		else
+		{
+			SetKeyDownState(SHIFT_LEFT, FALSE);
+			SetKeyDownState(SHIFT_RIGHT, FALSE);
+			SetKeyDownState(MOVE_LEFT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_LEFT)/*DIK_A*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD4) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_LEFT)));
+			SetKeyDownState(MOVE_RIGHT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_RIGHT)/*DIK_D*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD6) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_RIGHT)));
+		}
+		SetKeyDownState(ZOOM_IN, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_IN)/*DIK_INSERT*/)));
+		SetKeyDownState(ZOOM_OUT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_OUT)/*DIK_DELETE*/)));
+		SetKeyDownState(ZOOM_OUT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_OUT)/*DIK_DELETE*/)));
+		SetKeyDownState(FLY_DOWNWARD,!bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(FLY_DOWNWARD))));
 	}
-	else
-	{
-		SetKeyDownState(SHIFT_LEFT, FALSE);
-		SetKeyDownState(SHIFT_RIGHT, FALSE);
-		SetKeyDownState(MOVE_LEFT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_LEFT)/*DIK_A*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD4) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_LEFT)));
-		SetKeyDownState(MOVE_RIGHT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(MOVE_RIGHT)/*DIK_D*/) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_NUMPAD6) || pKeyboard->IsKeyPressed(EVirtualKey::KEY_RIGHT)));
-	}
-	SetKeyDownState(ZOOM_IN, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_IN)/*DIK_INSERT*/)));
-	SetKeyDownState(ZOOM_OUT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_OUT)/*DIK_DELETE*/)));
-	SetKeyDownState(ZOOM_OUT, !bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(ZOOM_OUT)/*DIK_DELETE*/)));
-	SetKeyDownState(FLY_DOWNWARD,!bIsKeyProcessed && (pKeyboard->IsKeyPressed(GetKeyMap(FLY_DOWNWARD))));
-
 
 	CGUIMouseVirtual* pMouse = (CGUIMouseVirtual*)(CGlobals::GetGUI()->m_pMouse);
 	if (pMouse && CGlobals::GetGUI()->m_events.size()>0)
@@ -1996,10 +1998,11 @@ void CAutoCamera::HandleUserInput()
 				{
 					if(GetEnableMouseWheel())
 					{
-						int nDelta = ((int32)(pMsg->lParam)) / 120;
-						if (nDelta == 0)
-							nDelta = ((int32)(pMsg->lParam)) > 0 ? 1 : -1;
-						m_nMouseWheelDelta = nDelta;
+						// int nDelta = ((int32)(pMsg->lParam)) / 120;
+						// if (nDelta == 0)
+						// 	nDelta = ((int32)(pMsg->lParam)) > 0 ? 1 : -1;
+						// m_nMouseWheelDelta = nDelta;
+						m_nMouseWheelDelta = (int)pMsg->lParam / 120;
 						m_nForceNoRollbackFrames = 1;
 					}
 				}
@@ -2201,16 +2204,17 @@ void CAutoCamera::HandleUserInput()
 		}
 	}
 
-	// added a movement mode, if both left and right button are down, we will assume the move forward
-	if(m_bMouseLButtonDown && m_bMouseRButtonDown)
-	{
-		SetKeyDownState(MOVE_FORWARD, true);
-		if(m_pTargetObject && m_pTargetObject->IsBiped())
-		{
-			CBipedObject* pBiped = ((CBipedObject*)m_pTargetObject);			
-			pBiped->SetFacing((float)m_fCameraRotY);
-		}
-	}
+
+	// // added a movement mode, if both left and right button are down, we will assume the move forward
+	// if(m_bMouseLButtonDown && m_bMouseRButtonDown)
+	// {
+	// 	SetKeyDownState(MOVE_FORWARD, true);
+	// 	if(m_pTargetObject && m_pTargetObject->IsBiped())
+	// 	{
+	// 		CBipedObject* pBiped = ((CBipedObject*)m_pTargetObject);			
+	// 		pBiped->SetFacing((float)m_fCameraRotY);
+	// 	}
+	// }
 
 }
 
