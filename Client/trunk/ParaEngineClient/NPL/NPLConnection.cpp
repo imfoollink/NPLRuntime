@@ -26,7 +26,7 @@ if defined, different NPL runtime can have different local map and file id map a
 
 /** @def the default maximum output message queue size. this is usually set to very big, such as 1024.
 the send message function will fail (service not available), if the queue is full */
-#define DEFAULT_NPL_OUTPUT_QUEUE_SIZE		1024
+#define DEFAULT_NPL_OUTPUT_QUEUE_SIZE 16384
 
 /** when the message size is bigger than this number of bytes, we will use m_nCompressionLevel for compression.
 For message smaller than the threshold, we will not compress even m_nCompressionLevel is not 0.
