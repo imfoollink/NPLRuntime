@@ -124,8 +124,10 @@ bool ParaEngine::CParaFileUtils::Move(const std::string& src, const std::string&
 	{
 		fs::path sSrc(src);
 		boost::system::error_code err_code;
-		fs::rename(sSrc, fs::path(dest), err_code);
-		OUTPUT_LOG("info (boost-fs): moved file/directory from %s to %s result message: %s\n", src.c_str(), dest.c_str(), err_code.message().c_str());
+		fs::copy_file(sSrc, fs::path(dest), err_code);
+		OUTPUT_LOG("info: boost copy file/directory result message: %s\n", err_code.message().c_str());
+		if (err_code.value() == 0)
+		    fs::remove(sSrc);
 		return err_code.value() == 0;
 	}
 	catch (...)

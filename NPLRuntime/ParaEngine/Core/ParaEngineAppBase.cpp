@@ -1392,6 +1392,32 @@ void ParaEngine::CParaEngineAppBase::LoadPackagesInFolder(const std::string& sPk
 
 		if (fileList.size() == 0)
 		{
+			if (CParaFile::DoesFileExist("main_crate900.pkg") || CParaFile::DoesFileExist("main_crate900.zip"))
+				fileList.push_back("main_crate900.zip");
+			if (CParaFile::DoesFileExist("main_crate105.pkg") || CParaFile::DoesFileExist("main_crate105.zip"))
+				fileList.push_back("main_crate900.zip");
+			if (CParaFile::DoesFileExist("main_crate104.pkg") || CParaFile::DoesFileExist("main_crate104.zip"))
+				fileList.push_back("main_crate104.zip");
+			if (CParaFile::DoesFileExist("main_crate103.pkg") || CParaFile::DoesFileExist("main_crate103.zip"))
+				fileList.push_back("main_crate103.zip");
+			if (CParaFile::DoesFileExist("main_crate102.pkg") || CParaFile::DoesFileExist("main_crate102.zip"))
+				fileList.push_back("main_crate102.zip");
+			if (CParaFile::DoesFileExist("main_crate100.pkg") || CParaFile::DoesFileExist("main_crate100.zip"))
+				fileList.push_back("main_crate100.zip");
+			if (CParaFile::DoesFileExist("main_crate005.pkg") || CParaFile::DoesFileExist("main_crate005.zip"))
+				fileList.push_back("main_crate005.zip");
+			if (CParaFile::DoesFileExist("main_crate004.pkg") || CParaFile::DoesFileExist("main_crate004.zip"))
+				fileList.push_back("main_crate004.zip");
+			if (CParaFile::DoesFileExist("main_crate003.pkg") || CParaFile::DoesFileExist("main_crate003.zip"))
+				fileList.push_back("main_crate003.zip");
+			if (CParaFile::DoesFileExist("main_crate002.pkg") || CParaFile::DoesFileExist("main_crate002.zip"))
+				fileList.push_back("main_crate002.zip");
+			if (CParaFile::DoesFileExist("main_crate001.pkg") || CParaFile::DoesFileExist("main_crate001.zip"))
+				fileList.push_back("main_crate001.zip");
+			if (CParaFile::DoesFileExist("main_mobile_res.pkg") || CParaFile::DoesFileExist("main_mobile_res.zip"))
+				fileList.push_back("main_mobile_res.zip");
+			if (CParaFile::DoesFileExist("main150727.pkg") || CParaFile::DoesFileExist("main150727.zip"))
+				fileList.push_back("main150727.zip");
 			if (CParaFile::DoesFileExist("main.pkg") || CParaFile::DoesFileExist("main.zip"))
 				fileList.push_back("main.zip");
 			if (bIs64Bits && CParaFile::DoesFileExist("main_64bits.pkg"))

@@ -8,7 +8,7 @@
 #include "AppDelegate.h"
 #include "jni/JniHelper.h"
 #include <android/log.h>
-
+ 
 
 /*
 	fixed link error with luajit2.0
