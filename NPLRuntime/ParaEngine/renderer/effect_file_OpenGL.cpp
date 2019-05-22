@@ -861,7 +861,7 @@ void ParaEngine::CEffectFileOpenGL::CommitChanges()
 		}
 		m_pendingChangesCount = 0;
 	}
-
+	m_SharedParamBlock.ApplyToEffect(static_cast<CEffectFile*>(this));
 	auto program = GetGLProgram(m_nTechniqueIndex, m_nActivePassIndex);
 	if(program)
 		program->commit();

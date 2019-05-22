@@ -104,6 +104,33 @@ bool CParameterBlock::ApplyToEffect( CEffectFile* pEffectFile )
 						pEffectFile->GetDXEffect()->SetTexture(name, pTextureEntity->GetTexture());
 					}
 				}
+#elif defined(USE_OPENGL_RENDERER)
+				// if it is texture parameter, the name must be numeric. 
+				const char* name = p.GetName().c_str();
+				TextureEntity* pTextureEntity = (TextureEntity*)p;
+				if (pTextureEntity != NULL && pTextureEntity->GetTexture())
+				{
+					if (name[0] >= '0' && name[0] <= '9')
+					{
+						// use predefined texture
+						int nIndex = (int)(name[0] - '0');
+						//pEffectFile->setTexture(nIndex, pTextureEntity->GetTexture());
+						/** 2008/1/10 by LXZ: since set texture is outside BeginPass() and EndPass(); we will set them by calling effect set texture, instead of d3d set texture.
+
+						2006/5/12
+						- [ATI bug Workaround]:  ATI card texture problem for shaders may be caused by the following.
+						sampler and texture states are not properly matched to GPU sampler register S#.
+						so for sampler states that will change by the SetSamplerState() call during the execution of shaders, one should explicitly specify sampler registers in HLSL.
+						Moreover, I have no idea who caused the following bug on ATI card (X1300,etc): the behavior of d3d SetTexture and that of the effect SetTexture are different.The effect SetTexture call
+						is totally unpredicatable on ATI cards. It seems to crash when setting multiple times between BeginPass() and EndPass().
+						The effect's SetTexture can set the shader sampler texture even outside BeginPass() and EndPass() except for ATI card, and d3d SetTexture only works inside the BeginPass() and EndPass()
+						for both Nvidia and ATI cards. In order to workaround the ATI bug, the problem is solved by using d3d SetTexture instead of effect SetTexture(which is preferred); moreover, I have to set ALL textures
+						between BeginPass() and EndPass() of any effect file, this may be inefficient since duplicated SetTexture calls may be called for the same sampler.
+
+						*/
+						pEffectFile->setTexture(nIndex, pTextureEntity->GetTexture());
+					}
+				}
 #endif
 			}
 			else

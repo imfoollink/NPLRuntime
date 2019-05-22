@@ -189,6 +189,8 @@ namespace ParaEngine
 
 		void SetShadowMapSize(int nsize);
 
+		virtual CParameterBlock* GetParamBlock(bool bCreateIfNotExist = false) { return &m_SharedParamBlock; }
+
 	protected:
 		GLProgram* GetGLProgram(int nTech, int nPass, bool bCreateIfNotExist = false);
 		typedef std::function<int (GLProgram* pProgram)> ProgramCallbackFunction_t;
@@ -231,6 +233,8 @@ namespace ParaEngine
 		
 		std::vector<CParameter> m_pendingChanges;
 		uint32 m_pendingChangesCount;
+
+		CParameterBlock m_SharedParamBlock;
 	};
 
 	
