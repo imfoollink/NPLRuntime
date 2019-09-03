@@ -334,7 +334,7 @@ namespace ParaScripting
 		* - it can also be a table of {animID, animID}: currently only two are supported. The first one is usually a non-loop, and second one can be loop or non-loop. 
 		*/
 		void PlayAnimation(const object& anims);
-		
+
 		/** Plat a specified animation by its animation index.
 		* @param nIndex: the animation index.
 		* @param bUpdateSpeed: whether to update the biped's speed according to the one defined in the animation.

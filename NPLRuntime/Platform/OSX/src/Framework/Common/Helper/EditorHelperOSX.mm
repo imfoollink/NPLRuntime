@@ -1,7 +1,7 @@
 #include "ParaEngine.h"
 #include "Framework/Common/Helper/EditorHelper.h"
 #include "IParaWebView.h"
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
 
 namespace ParaEngine {
 
@@ -48,21 +48,19 @@ namespace ParaEngine {
 		return true;
 	}
 
-    
 	static bool execute(const char* lpFile, const char* lpParameters, const char* lpDirectory, int nShowCmd)
 	{
-        std::string cmd =  "open ";
-		
-		if (strcmp(lpParameters, "explorer.exe") == 0)
-			cmd += lpDirectory;
+        std::string cmd = "open ";
+
+		if (strcmp(lpFile, "explorer.exe") == 0)
+			cmd += lpParameters;
 		else
 			cmd += lpFile;
-        
+
         system(cmd.c_str());
-        
+
         return true;
 	}
-
 
 	bool CEditorHelper::ShellExecute(const char* lpOperation, const char* lpFile, const char* lpParameters, const char* lpDirectory, int nShowCmd)
 	{

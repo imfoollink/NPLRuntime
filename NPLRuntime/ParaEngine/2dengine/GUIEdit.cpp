@@ -752,77 +752,6 @@ void CGUIEditBox::UpdateRects()
 }
 
 
-void CGUIEditBox::CopyToClipboard()
-{
-#ifdef WIN32
-	// Copy the selection text to the clipboard
-	if (m_nCaret != m_nSelStart && OpenClipboard(NULL))
-	{
-		EmptyClipboard();
-
-		HGLOBAL hBlock = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * (m_Buffer.GetTextSize() + 1));
-		if (hBlock)
-		{
-			WCHAR *pwszText = (WCHAR*)GlobalLock(hBlock);
-			if (pwszText)
-			{
-				int nFirst = Math::Min(m_nCaret, m_nSelStart);
-				int nLast = Math::Max(m_nCaret, m_nSelStart);
-				if (nLast - nFirst > 0)
-				{
-					if (m_PasswordChar == '\0')
-					{
-						CopyMemory(pwszText, m_Buffer.GetBuffer() + nFirst, (nLast - nFirst) * sizeof(WCHAR));
-					}
-					else
-					{
-						for (int i = 0; i < (nLast - nFirst); ++i)
-						{
-							pwszText[i] = m_PasswordChar;
-						}
-					}
-				}
-				pwszText[nLast - nFirst] = '\0';  // Terminate it
-				GlobalUnlock(hBlock);
-			}
-			SetClipboardData(CF_UNICODETEXT, hBlock);
-		}
-		CloseClipboard();
-		// We must not free the object until CloseClipboard is called.
-		if (hBlock)
-			GlobalFree(hBlock);
-	}
-#endif
-}
-
-
-void CGUIEditBox::PasteFromClipboard()
-{
-	DeleteSelectionText();
-#ifdef WIN32
-	if (OpenClipboard(NULL))
-	{
-		HANDLE handle = GetClipboardData(CF_UNICODETEXT);
-		if (handle)
-		{
-			// Convert the ANSI string to Unicode, then
-			// insert to our buffer.
-			char16_t *pwszText = (char16_t*)GlobalLock(handle);
-			if (pwszText)
-			{
-				// Copy all characters up to null.
-				if (m_Buffer.InsertString(m_nCaret, pwszText))
-					PlaceCaret(m_nCaret + lstrlenW((WCHAR*)pwszText));
-				m_nSelStart = m_nCaret;
-				m_bIsModified = true;
-				GlobalUnlock(handle);
-			}
-		}
-		CloseClipboard();
-	}
-#endif
-}
-
 
 //--------------------------------------------------------------------------------------
 bool CGUIEditBox::OnFocusIn()
@@ -905,6 +834,7 @@ bool CGUIEditBox::MsgProc(MSG *event)
 	pt.x = m_event->m_mouse.x;
 	pt.y = m_event->m_mouse.y;
 	int nEvent = m_event->GetTriggerEvent();
+
 	MSG newMsg;
 	DWORD dCurrTime = event->time;
 	DWORD static dLastTime = 0;
@@ -1823,23 +1753,30 @@ int ParaEngine::CGUIEditBox::GetTextA(std::string& out)
 void ParaEngine::CGUIEditBox::OnSelectStart()
 {
 #ifdef PARAENGINE_MOBILE
-	//if (m_bHasFocus)
-//		attachWithIME();
+	if (m_bHasFocus)
+		attachWithIME();
 #endif
 }
 
 #ifdef PARAENGINE_MOBILE
 bool ParaEngine::CGUIEditBox::attachWithIME()
 {
-	//bool ret = GUIIMEDelegate::attachWithIME();
-	//return ret;
-	return true;
+	bool ret = GUIIMEDelegate::attachWithIME();
+	if (ret)
+	{
+		CGlobals::GetApp()->setIMEKeyboardState(true);
+	}
+	return ret;
 }
 
 bool ParaEngine::CGUIEditBox::detachWithIME()
 {
-	//bool ret = GUIIMEDelegate::detachWithIME();
-	//return ret;
+	bool ret = GUIIMEDelegate::detachWithIME();
+	if (ret)
+	{
+		CGlobals::GetApp()->setIMEKeyboardState(false);
+	}
+
 	return true;
 }
 
@@ -1861,42 +1798,22 @@ void ParaEngine::CGUIEditBox::didDetachWithIME()
 {
 }
 
-void ParaEngine::CGUIEditBox::insertText(const char * text, size_t len)
-{
-	//OUTPUT_LOG("IME insert text %s\n", text);
-	std::string str;
-	str.reserve(len);
-	for (size_t i = 0; i < len; ++i)
-	{
-		char c = text[i];
-		// skip \r\n character. 
-		if (c != '\r' && c != '\n' && c != '\0')
-			str.push_back(c);
-	}
-	// OUTPUT_LOG("GUI editbox : insert text: %s (count:%d)\n", str.c_str(), (int)str.size());
-	// m_Buffer.SetTextA(str.c_str());
-	m_Buffer.InsertStringA(-1, str.c_str(), str.size());
-	m_bIsModified = true;
-	OnModify();
-	SetCaretPosition(-1);
-}
-
 void ParaEngine::CGUIEditBox::deleteBackward()
 {
-	// deletion is handled via MsgProc under win32
-#ifndef WIN32
-	m_Buffer.RemoveChar(-1);
-	SetCaretPosition(-1);
-	m_bIsModified = true;
-	OnModify();
-#endif
+
+}
+
+
+const std::u16string& ParaEngine::CGUIEditBox::getContentUTF16Text()
+{
+	return m_Buffer.GetUtf16Text();
 }
 
 const std::string& ParaEngine::CGUIEditBox::getContentText()
 {
 	return m_Buffer.GetUtf8Text();
 }
-#endif
+#endif // PARAENGINE_MOBILE
 
 const std::string& ParaEngine::CGUIEditBox::GetEmptyText()
 {

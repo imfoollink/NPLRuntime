@@ -299,7 +299,8 @@ bool ParaEngine::RenderDeviceOpenGL::SetTexture(uint32_t stage, DeviceTexturePtr
 {
 	//glActiveTexture(GL_TEXTURE0 + stage);
 	//glBindTexture(GL_TEXTURE_2D, texture);
-	texture->bindN(stage);
+
+	texture->bindN(texture, stage);
 
 	PE_CHECK_GL_ERROR_DEBUG();
 	//auto error = glGetError();
@@ -478,6 +479,10 @@ bool ParaEngine::RenderDeviceOpenGL::EndScene()
 
 }
 
+void ParaEngine::RenderDeviceOpenGL::Flush()
+{
+	glFinish();
+}
 
 
 int ParaEngine::RenderDeviceOpenGL::GetStencilBits()

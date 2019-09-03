@@ -364,6 +364,14 @@ void CParameterBlock::SetParamByStringValue(const char* sParamName, const char* 
 		{
 			ParaMatrixMultiply(&mat, pWorld, pView);
 		}
+		else if (sValue == "mat4World")
+		{
+			mat = *pWorld;
+		}
+		else if (sValue == "mat4WorldInverse")
+		{
+			mat = pWorld->inverse();
+		}
 		else if (sValue == "mat4View")
 		{
 			mat = *pView;
@@ -378,6 +386,7 @@ void CParameterBlock::SetParamByStringValue(const char* sParamName, const char* 
 			ParaMatrixMultiply(&mat_, pWorld, pView);
 			mat = mat_.inverse();
 		}
+		// FIXME: maybe the next 2 matrix calculation here got something wrong!
 		else if (sValue == "mat4WorldViewProjection")
 		{
 			Matrix4 ViewProj;

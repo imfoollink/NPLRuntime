@@ -797,9 +797,56 @@ bool ParaEngine::CParaEngineAppBase::InitCommandLineParams()
 	return true;
 }
 
+void ParaEngine::CParaEngineAppBase::setIMEKeyboardState(bool bOpen)
+{
+
+}
+
 bool ParaEngine::CParaEngineAppBase::ForceRender()
 {
+	if (!getRenderEnabled())
+		return false;
+
+	auto pRenderDevice = m_pRenderDevice;
+	
+
+#ifndef ONLY_FORCERENDER_GUI 
+	Render();
+	pRenderDevice->Flush();
+
+	return true;
+#else
+
+	if (pRenderDevice->BeginScene())
+	{
+#if USE_DIRECTX_RENDERER
+		GETD3D(pRenderDevice)->SetRenderTarget(0, CGlobals::GetDirectXEngine().GetRenderTarget(0)); // force setting render target to back buffer. and
+#endif
+
+		auto color = m_pRootScene->GetClearColor();
+
+		// NOTE: on android devices will ignore all gl calls after the last draw call, so we need to restore everything to default settings
+		pRenderDevice->SetRenderState(ERenderState::ZWRITEENABLE, TRUE);
+		pRenderDevice->SetRenderState(ERenderState::ZENABLE, TRUE);
+		pRenderDevice->SetRenderState(ERenderState::ZFUNC, D3DCMP_LESSEQUAL);
+		pRenderDevice->SetRenderState(ERenderState::CULLMODE, RSV_CULL_CCW);
+
+		pRenderDevice->SetClearColor(Color4f(color.r, color.g, color.b, color.a));
+		pRenderDevice->SetClearDepth(1.0f);
+		pRenderDevice->SetClearStencil(0);
+		pRenderDevice->Clear(true, true, true);
+
+		CGlobals::GetGUI()->AdvanceGUI(0);
+
+		pRenderDevice->EndScene();
+
+		//bSucceed = pRenderDevice->Present();
+		pRenderDevice->Flush();
+		return true;
+	}
+
 	return false;
+#endif 
 }
 
 const char * ParaEngine::CParaEngineAppBase::GetModuleDir() 
@@ -1210,7 +1257,7 @@ bool ParaEngine::CParaEngineAppBase::LoadNPLPackage(const char* sFilePath_, std:
 				}
 #endif
 
-				if (strcmp("false", CCommandLineParams::GetAppCommandLineByParam("disable-parent-package-lookup", "false")))
+				if (strcmp("false", CCommandLineParams::GetAppCommandLineByParam("disable-parent-package-lookup", "false")) == 0)
 				{
 					if (sPKGDir.empty() && !m_sModuleDir.empty())
 					{
